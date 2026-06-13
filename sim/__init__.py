@@ -9,10 +9,12 @@ Public surface — import these rather than reaching into submodules:
 """
 
 from sim.engine import default_state, from_json, load, save, tick, to_json
-from sim.state import CELL_GLYPHS, CellType, GameState, Resident
+from sim.generator import generate
+from sim.state import CELL_GLYPHS, CellType, GameState, Resident, Room
 
 __all__ = [
     "default_state",
+    "generate",
     "tick",
     "save",
     "load",
@@ -20,6 +22,7 @@ __all__ = [
     "from_json",
     "GameState",
     "Resident",
+    "Room",
     "CellType",
     "CELL_GLYPHS",
 ]

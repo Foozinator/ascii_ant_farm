@@ -37,21 +37,27 @@ class AntFarmApp(App[None]):
 
     #panels { height: 1fr; }
 
+    /* Left column: colony grid stacked above the status/debug panel. */
+    #left { width: 42; height: 1fr; }
+
     #grid {
-        width: 24;
+        width: 100%;
+        height: auto;
         border: round $accent;
         padding: 0 1;
         content-align: center middle;
     }
 
     #status {
-        width: 38;
+        width: 100%;
+        height: auto;
         border: round $secondary;
         padding: 0 1;
     }
 
     #log {
         width: 1fr;
+        height: 1fr;
         border: round $primary;
         padding: 0 1;
     }
@@ -72,10 +78,10 @@ class AntFarmApp(App[None]):
     def compose(self) -> ComposeResult:
         yield Header()
         with Horizontal(id="panels"):
-            yield Static(id="grid")
-            yield Static(id="status")
-            with Vertical():
-                yield RichLog(id="log", wrap=True, markup=True, highlight=False)
+            with Vertical(id="left"):
+                yield Static(id="grid")
+                yield Static(id="status")
+            yield RichLog(id="log", wrap=True, markup=True, highlight=False)
         yield Input(
             placeholder="feed 5  |  light 80  |  metric mood  |  or type a sentence…",
             id="cmd",

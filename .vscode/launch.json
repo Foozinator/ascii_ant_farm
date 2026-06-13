@@ -1,0 +1,46 @@
+{
+  // Run/debug configs for ASCII Ant Farm. Use the Run and Debug panel (Ctrl+Shift+D)
+  // and pick one, or press F5 / Ctrl+F5 (run without debugging). Each sets the
+  // LLM_* / OLLAMA_* env vars, so they don't have to be set in the shell.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Ant Farm — Ollama (TUI)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "env": {
+        "LLM_BACKEND": "ollama",
+        "OLLAMA_BASE_URL": "http://localhost:11434",
+        "OLLAMA_MODEL": "gemma4:e4b"
+      }
+    },
+    {
+      "name": "Ant Farm — Ollama (headless demo)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--demo"],
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "env": {
+        "LLM_BACKEND": "ollama",
+        "OLLAMA_BASE_URL": "http://localhost:11434",
+        "OLLAMA_MODEL": "gemma4:e4b"
+      }
+    },
+    {
+      "name": "Ant Farm — Stub (offline, TUI)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "env": {
+        "LLM_BACKEND": "stub"
+      }
+    }
+  ]
+}

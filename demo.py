@@ -49,7 +49,10 @@ def _show_colony(state: GameState) -> None:
 
 
 def run_demo() -> None:
+    import llm
+
     _banner("ASCII Ant Farm - walking skeleton demo")
+    print(llm.check_backend()[1])  # which engine is active (and reachable?)
     state = default_state()
     print("\nInitial colony:\n")
     _show_colony(state)

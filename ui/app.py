@@ -71,9 +71,12 @@ class AntFarmApp(App[None]):
         ("ctrl+q", "quit", "Quit"),
     ]
 
-    def __init__(self, state: GameState | None = None) -> None:
+    def __init__(
+        self, state: GameState | None = None, init_message: str | None = None
+    ) -> None:
         super().__init__()
         self.state: GameState = state if state is not None else default_state()
+        self._init_message = init_message
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -89,8 +92,18 @@ class AntFarmApp(App[None]):
         yield Footer()
 
     def on_mount(self) -> None:
+        import llm
+
+        # Show the active engine in the header subtitle (config-only, no network)...
+        self.sub_title = llm.describe_backend()
+
         self._render()
         log = self.query_one("#log", RichLog)
+        # ...and the startup/reachability message in the log panel.
+        if self._init_message:
+            ok = "UNREACHABLE" not in self._init_message and "NOT installed" not in self._init_message
+            color = "green" if ok else "red"
+            log.write(f"[{color}]{self._init_message}[/{color}]")
         for event in self.state.event_log:
             log.write(event)
         self.query_one("#cmd", Input).focus()

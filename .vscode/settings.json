@@ -1,0 +1,7 @@
+{
+  // Use the project venv for the ▶ Run button, debugging, and the test explorer.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  // Applied to debug sessions (F5) and the test runner. NOTE: the plain ▶ Run
+  // button does NOT load this — main.py loads .env itself so the button still works.
+  "python.envFile": "${workspaceFolder}/.env"
+}

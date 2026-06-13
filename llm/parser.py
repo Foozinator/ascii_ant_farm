@@ -1,60 +1,26 @@
-"""``parse`` — natural language in, an :class:`EffectEnvelope` out. STUBBED.
+"""``parse`` — natural language in, an :class:`EffectEnvelope` out.
 
-This is the gesture-path AI interface. When a player types a free sentence that
-the deterministic command grammar doesn't recognize, the router hands it here.
+The gesture-path AI interface. The router hands a free sentence here when the
+deterministic command grammar doesn't recognize it. This module is a thin facade:
+it delegates to the active backend (stub or Ollama) selected by ``LLM_BACKEND``.
+The signature is the stable contract the backends implement:
+``parse(sentence, state) -> EffectEnvelope``.
 
-The real implementation will prompt a local Ollama model to translate the
-sentence into structured effects. For the walking skeleton it returns a *canned
-but valid* envelope, derived with a few keyword heuristics so the demo feels
-alive — no model, no network. The signature is the contract the real version
-must satisfy: ``parse(sentence, state) -> EffectEnvelope``.
-
-Imports only :mod:`contract` and :mod:`llm.views`; never ``sim``.
+Imports only :mod:`contract`, :mod:`llm.runtime`, and :mod:`llm.views`; never ``sim``.
 """
 
 from __future__ import annotations
 
-from contract import Effect, EffectEnvelope, EffectType
+from contract import EffectEnvelope
+from llm.runtime import get_backend
 from llm.views import StateView
-
-# Room words the stub recognizes, so "...over the offices" targets the offices.
-_ROOM_WORDS = ("offices", "nursery", "pantry")
-
-# Crude sentiment buckets that decide which way a gesture nudges mood.
-_HARSH = ("tap", "bang", "knock", "shake", "flood", "poke", "rattle")
-_KIND = ("calm", "soothe", "sing", "warm", "praise", "comfort")
-
-
-def _guess_target(sentence: str) -> str:
-    low = sentence.lower()
-    for room in _ROOM_WORDS:
-        if room in low or room.rstrip("s") in low:
-            return room
-    return "colony"
-
-
-def _guess_magnitude(sentence: str) -> float:
-    low = sentence.lower()
-    if any(w in low for w in _HARSH):
-        return -0.10
-    if any(w in low for w in _KIND):
-        return 0.08
-    return -0.03
 
 
 def parse(sentence: str, state: StateView) -> EffectEnvelope:
-    """Translate a free sentence into an :class:`EffectEnvelope` (stub).
+    """Translate a free sentence into an :class:`EffectEnvelope`.
 
-    ``state`` is accepted (and typed) to match the real interface — a model
-    would condition on the current colony — but the stub does not need it.
-    Always returns a valid envelope; the router still re-validates it at the seam.
+    Routed to the active backend. Always returns a valid envelope (backends
+    degrade malformed/empty/erroring model output to a safe value rather than
+    raising); the router still re-validates at the seam.
     """
-    del state  # unused by the stub; part of the real signature.
-
-    target = _guess_target(sentence)
-    magnitude = _guess_magnitude(sentence)
-    prose = f"You {sentence.strip().rstrip('.')}. The colony registers it."
-    return EffectEnvelope(
-        prose=prose,
-        effects=[Effect(type=EffectType.GESTURE, target=target, magnitude=magnitude)],
-    )
+    return get_backend().parse(sentence, state)

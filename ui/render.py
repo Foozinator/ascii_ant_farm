@@ -12,10 +12,25 @@ _MOOD_BAR_WIDTH = 10
 
 
 def render_grid(state: GameState) -> str:
-    """Render the colony grid as a block of ASCII glyphs, one row per line."""
-    return "\n".join(
-        "".join(CELL_GLYPHS[cell] for cell in row) for row in state.grid
-    )
+    """Render the colony grid as ASCII glyphs with residents overlaid."""
+    # Build a position → glyph map for placed residents.
+    # First resident at each cell wins; glyph is the uppercase initial of the archetype.
+    resident_at: dict[tuple[int, int], str] = {}
+    for r in state.residents:
+        if r.row is not None and r.col is not None:
+            key = (r.row, r.col)
+            if key not in resident_at:
+                glyph = r.archetype[0].upper() if r.archetype else "@"
+                resident_at[key] = glyph
+
+    lines: list[str] = []
+    for ri, row in enumerate(state.grid):
+        chars: list[str] = []
+        for ci, cell in enumerate(row):
+            g = resident_at.get((ri, ci))
+            chars.append(g if g is not None else CELL_GLYPHS[cell])
+        lines.append("".join(chars))
+    return "\n".join(lines)
 
 
 def _mood_bar(mood: float) -> str:
@@ -39,6 +54,6 @@ def render_status(state: GameState) -> str:
         )
     lines += [
         "",
-        "legend: # dirt  . tunnel  O offices  N nursery  P pantry",
+        "legend: # dirt  . tunnel  O offices  N nursery  P pantry  letter=resident",
     ]
     return "\n".join(lines)

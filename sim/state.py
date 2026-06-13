@@ -44,12 +44,23 @@ CELL_GLYPHS: dict[CellType, str] = {
 _GLYPH_TO_CELL: dict[str, CellType] = {g: c for c, g in CELL_GLYPHS.items()}
 
 
+class Room(BaseModel):
+    """A connected floor region carved from dirt."""
+
+    id: str
+    room_type: CellType
+    cells: list[list[int]]  # [[row, col], ...] floor positions
+
+
 class Resident(BaseModel):
     """One ant. ``mood`` is a 0..1 float; ``archetype`` is a free tag."""
 
     id: str
     mood: float = 0.5
     archetype: str = "worker"
+    row: int | None = None  # grid position; None = not placed
+    col: int | None = None
+    room_id: str = ""  # which room they inhabit
 
 
 class GameState(BaseModel):
@@ -71,6 +82,7 @@ class GameState(BaseModel):
     power: float = 50.0
 
     residents: list[Resident] = Field(default_factory=list)
+    rooms: list[Room] = Field(default_factory=list)
 
     # Rolling history the UI shows; trimmed to the last few entries by the engine.
     event_log: list[str] = Field(default_factory=list)

@@ -1,0 +1,33 @@
+[project]
+name = "ascii-ant-farm"
+version = "0.1.0"
+description = "An AI-augmented ASCII ant farm in the terminal (walking skeleton)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "textual>=0.80",
+    "pydantic>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+]
+
+[project.scripts]
+ascii-ant-farm = "main:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+# Flat layout: top-level modules plus the three isolated packages.
+[tool.setuptools]
+py-modules = ["contract", "router", "main", "demo"]
+packages = ["sim", "llm", "ui"]
+
+[tool.pytest.ini_options]
+# Run from the repo root so `import contract`, `from sim import ...`, etc. resolve
+# without installing the project.
+pythonpath = ["."]
+testpaths = ["tests"]

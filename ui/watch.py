@@ -12,8 +12,14 @@ from __future__ import annotations
 
 import time
 
+from rich.console import Console
+
 from sim import GameState, tick
 from ui.render import render_grid, render_status
+
+# A Console for the animation frames: it detects the real terminal's colour
+# support and downsamples the styled renderables accordingly.
+_console = Console()
 
 
 def _clear() -> None:
@@ -49,9 +55,9 @@ def run_watch(
             state = tick(state, [])
             _clear()
             print(f"  ASCII Ant Farm  |  watch {frame + 1}/{n_ticks}  |  Ctrl-C to stop\n")
-            print(render_grid(state))
+            _console.print(render_grid(state), soft_wrap=True)
             print()
-            print(render_status(state))
+            _console.print(render_status(state), soft_wrap=True)
             if state.last_events:
                 print()
                 for ev in state.last_events[-3:]:

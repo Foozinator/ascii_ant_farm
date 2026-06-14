@@ -38,14 +38,12 @@ class AntFarmApp(App[None]):
     #panels { height: 1fr; }
 
     #grid {
-        width: 24;
         border: round $accent;
         padding: 0 1;
         content-align: center middle;
     }
 
     #status {
-        width: 38;
         border: round $secondary;
         padding: 0 1;
     }
@@ -82,7 +80,21 @@ class AntFarmApp(App[None]):
         )
         yield Footer()
 
+    def _size_panels(self) -> None:
+        """Set panel widths from the live grid dimensions.
+
+        Grid: grid chars + 2 padding (1 each side) + 2 border = width + 4.
+        Status: longest resident line is roughly 42 chars; add 4 for chrome.
+        """
+        grid_w = self.state.width + 4
+        # Status holds "  ant-NN  [##--------] 0.00  archetype_id" — roughly
+        # 46 chars for the widest archetype id; add chrome.
+        status_w = 46 + 4
+        self.query_one("#grid", Static).styles.width = grid_w
+        self.query_one("#status", Static).styles.width = status_w
+
     def on_mount(self) -> None:
+        self._size_panels()
         self._render()
         log = self.query_one("#log", RichLog)
         for event in self.state.event_log:
@@ -123,5 +135,6 @@ class AntFarmApp(App[None]):
             log.write(f"[red]no save at {SAVE_PATH}[/red]")
             return
         self.state = load(SAVE_PATH)
+        self._size_panels()
         self._render()
         log.write(f"[green]loaded ← {SAVE_PATH}[/green]")
